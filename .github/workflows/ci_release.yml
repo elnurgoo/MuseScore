@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send release info
+
         run: |
           RELEASE_INFO=""
           curl \
