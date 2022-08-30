@@ -12,9 +12,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Send release info
-        id: send_release
-        uses: Eism/MuseScore@v1.2.3
-        env:
         run: |
           GITHUB_TOKEN: ${{ github.token }}
           curl \
