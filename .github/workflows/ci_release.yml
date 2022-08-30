@@ -2,19 +2,26 @@ name: Send release info
 
 on:
   release:
-    types: [published]
+    types: [ published ]
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build:
+  send-release-info:
     runs-on: ubuntu-latest
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
       - name: Send release info
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "START"
+
           curl \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            https://api.github.com/repos/Eism/MuseScore/releases/latest > ${RELEASE_INFO}
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/latest > ${RELEASE_INFO}
 
           echo "Release info = ${RELEASE_INFO}"
