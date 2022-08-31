@@ -1,44 +1,25 @@
-name: Release
+name: Send release info
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [created]
 
 jobs:
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@main
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v2.1.4
-        with:
-          python-version: 3.8.6
-          architecture: x64
-      - name: Get version from tag
-        id: tag_name
-        run: |
-          echo ::set-output name=current_version::${GITHUB_REF#refs/tags/v}
-        shell: bash
-      - name: Get notes
-        id: generate_notes
-        uses: Eism/MuseScore@master
-        with:
-          tag_name: ${{ github.ref }}
-          changelog: CHANGELOG.md
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Send release info
+        id: send_release
+        uses: Eism/MuseScore@v1.2.3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          prerelease: false
-          draft: false
-          body: ${{join(fromJson(steps.generate_notes.outputs.notes).notes, '')}}
+        run: |
+          GITHUB_TOKEN: ${{ github.token }}
+          curl \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }} \
+            https://api.github.com/repos/Eism/MuseScore/releases/latest > ${RELEASE_INFO}
+
+          echo "Release info = ${RELEASE_INFO}"
