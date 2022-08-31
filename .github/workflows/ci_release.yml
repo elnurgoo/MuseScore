@@ -8,16 +8,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Send release info
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GITHUB_TOKEN} \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             https://api.github.com/repos/Eism/MuseScore/releases/latest > ${RELEASE_INFO}
 
           echo "Release info = ${RELEASE_INFO}"
