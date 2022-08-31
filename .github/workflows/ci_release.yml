@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send release info
+
         run: |
-          RELEASE_INFO=""
-          curl \
+          RELEASE_INFO=$(curl \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest > "$RELEASE_INFO"
+            https://api.github.com/repos/${{ github.repository }}/releases/latest)
 
           echo "Release info = ${RELEASE_INFO}"
