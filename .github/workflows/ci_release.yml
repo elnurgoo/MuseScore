@@ -1,4 +1,4 @@
-name: Send release info
+name: Collect release info
 
 on:
   release:
@@ -9,15 +9,18 @@ defaults:
     shell: bash
 
 jobs:
-  send-release-info:
-    runs-on: ubuntu-latest
+  update-release-info:
+    runs-on: ubuntu-20.04
     steps:
-      - name: Send release info
+      - name: Clone repository
+        uses: actions/checkout@v2
 
+      - name: Update info about the latest release in musescore-updates
         run: |
-          RELEASE_INFO=$(curl \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest)
-
-          echo "Release info = ${RELEASE_INFO}"
+          sudo bash ./build/ci/release/update_latest_release_info.sh \
+            --token ${{ secrets.GITHUB_TOKEN }} \
+            --repo ${{ github.repository }} \
+            --s3_key ${{ secrets.S3_KEY }} \
+            --s3_secret ${{ secrets.S3_SECRET }} \
+            --s3_url "s3://musescore-updates/feed/" \
+            --s3_bucket "s3.musescore-updates"
