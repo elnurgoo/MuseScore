@@ -2,7 +2,7 @@ name: Send release info
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
