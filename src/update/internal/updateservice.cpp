@@ -83,7 +83,8 @@ mu::async::Promise<mu::RetVal<ReleaseInfo> > UpdateService::checkForUpdate()
 
         result.ret = make_ok();
         if (QVersionNumber::fromString(QString::fromStdString(releaseInfo.val.version)) > QVersionNumber::fromString(VERSION)) {
-            result.val = releaseInfo.val;
+            result.ret = make_ret(Err::NoUpdate);
+            return reject(result.ret.code(), result.ret.text());
         }
 
         m_lastCheckResult = releaseInfo.val;
