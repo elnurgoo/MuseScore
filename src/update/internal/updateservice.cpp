@@ -23,13 +23,15 @@
 #include "updateservice.h"
 
 #include <QBuffer>
-#include <QVersionNumber>
 #include <QJsonParseError>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonDocument>
 
 #include "../updateerrors.h"
+#include "types/version.h"
+#include "muversion.h"
 
 #include "translation.h"
 #include "config.h"
@@ -37,6 +39,7 @@
 
 using namespace mu::update;
 using namespace mu::network;
+using namespace mu::framework;
 
 static std::string platformFileSuffix()
 {
@@ -77,9 +80,9 @@ mu::RetVal<ReleaseInfo> UpdateService::checkForUpdate()
         return result;
     }
 
-    QVersionNumber current = QVersionNumber::fromString(QString::fromStdString(VERSION));
-    QVersionNumber update = QVersionNumber::fromString(QString::fromStdString(releaseInfo.val.version));
-    if (current.normalized() >= update.normalized()) {
+    Version current(MUVersion::fullVersion());
+    Version update(String::fromStdString(releaseInfo.val.version));
+    if (update <= current) {
         return result;
     }
 
@@ -158,7 +161,7 @@ mu::RetVal<ReleaseInfo> UpdateService::parseRelease(const QByteArray& json) cons
     std::string fileSuffix = platformFileSuffix();
 
     QJsonArray assets = release.value("assets").toArray();
-    for (const QJsonValue& asset : assets) {
+    for (const QJsonValue asset : assets) {
         QJsonObject assetObj = asset.toObject();
 
         QString name = assetObj.value("name").toString();
