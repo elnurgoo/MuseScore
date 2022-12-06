@@ -24,7 +24,7 @@
 
 #include "translation.h"
 
-#include "version.h"
+#include "muversion.h"
 
 using namespace mu::appshell;
 
@@ -93,7 +93,7 @@ void MainToolBarModel::load()
     m_items << buildItem(mu::qtrc("appshell", "Score"), NOTATION_PAGE);
     m_items << buildItem(mu::qtrc("appshell", "Publish"), PUBLISH_PAGE);
 
-    if (framework::Version::unstable()) {
+    if (framework::MUVersion::unstable()) {
         m_items << buildItem(mu::qtrc("appshell", "DevTools"), DEVTOOLS_PAGE);
     }
 

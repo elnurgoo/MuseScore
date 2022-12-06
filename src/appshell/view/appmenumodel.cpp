@@ -24,7 +24,7 @@
 #include "types/translatablestring.h"
 
 #include "config.h"
-#include "version.h"
+#include "muversion.h"
 #include "log.h"
 
 using namespace mu::appshell;
@@ -382,7 +382,7 @@ MenuItem* AppMenuModel::makeDiagnosticMenu()
     items << makeMenu(TranslatableString("appshell/menu/diagnostic", "&Muse Sampler"), museSamplerItems, "menu-musesampler");
 #endif
 
-    if (framework::Version::unstable()) {
+    if (framework::MUVersion::unstable()) {
         items << makeMenu(TranslatableString("appshell/menu/diagnostic", "&Accessibility"), accessibilityItems, "menu-accessibility")
               << makeMenu(TranslatableString("appshell/menu/diagnostic", "&Engraving"), engravingItems, "menu-engraving")
               << makeMenu(TranslatableString("appshell/menu/diagnostic", "Auto&bot"), autobotItems, "menu-autobot")
