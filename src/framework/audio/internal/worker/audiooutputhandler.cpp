@@ -200,30 +200,47 @@ Promise<bool> AudioOutputHandler::saveSoundTrack(const TrackSequenceId sequenceI
         s->player()->stop();
         s->player()->seek(0);
         msecs_t totalDuration = s->player()->duration();
-        SoundTrackWriter writer(destination, format, totalDuration, mixer());
+
+        SoundTrackWriterPtr writer = std::make_shared<SoundTrackWriter>(destination, format, totalDuration, mixer());
+        m_saveSoundTracksWritersMap[sequenceId] = writer;
 
         framework::Progress progress = saveSoundTrackProgress(sequenceId);
-        writer.progress().progressChanged.onReceive(this, [&progress](int64_t current, int64_t total, std::string title) {
+        writer->progress().progressChanged.onReceive(this, [&progress](int64_t current, int64_t total, std::string title) {
             progress.progressChanged.send(current, total, title);
         });
 
-        bool ok = writer.write();
+        Ret ret = writer->write();
         s->player()->seek(0);
 
-        return resolve(ok);
+        m_saveSoundTracksWritersMap.remove(sequenceId);
+
+        if (!ret) {
+            return reject(ret.code(), ret.text());
+        }
+
+        return resolve(ret);
 #else
         return reject(static_cast<int>(Err::DisabledAudioExport), "audio export is disabled");
 #endif
     }, AudioThread::ID);
 }
 
+void AudioOutputHandler::abortSavingAllSoundTracks()
+{
+#ifdef ENABLE_AUDIO_EXPORT
+    for (SoundTrackWriterPtr writer : m_saveSoundTracksWritersMap.values()) {
+        writer->abort();
+    }
+#endif
+}
+
 mu::framework::Progress AudioOutputHandler::saveSoundTrackProgress(const TrackSequenceId sequenceId)
 {
-    if (!m_saveSoundTracksMap.contains(sequenceId)) {
-        m_saveSoundTracksMap.insert(sequenceId, framework::Progress());
+    if (!m_saveSoundTracksProgressMap.contains(sequenceId)) {
+        m_saveSoundTracksProgressMap.insert(sequenceId, framework::Progress());
     }
 
-    return m_saveSoundTracksMap[sequenceId];
+    return m_saveSoundTracksProgressMap[sequenceId];
 }
 
 void AudioOutputHandler::clearAllFx()
