@@ -79,3 +79,6 @@ The new [script testing facility](https://musescore.org/node/278278) is also ava
 Run `./hooks/install.sh` to install a pre-commit hook that will format your staged files. Requires that you install `uncrustify`.
 
 If you have problems, please report them. To uninstall, run `./hooks/uninstall.sh`.
+
+
+TEST 
